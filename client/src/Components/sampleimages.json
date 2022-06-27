@@ -1,0 +1,55 @@
+{
+  "resources": [
+    {
+      "url": "http://res.cloudinary.com/zowo1441/image/upload/v1654710784/cld-sample-5.jpg",
+      "event": "event1",
+      "year": "2020"
+    },
+    {
+      "url": "http://res.cloudinary.com/zowo1441/image/upload/v1654710783/cld-sample-4.jpg",
+      "event": "event1",
+      "year": "2019"
+    },
+    {
+      "url": "http://res.cloudinary.com/zowo1441/image/upload/v1654710783/cld-sample-3.jpg",
+      "event": "event1",
+      "year": "2018"
+    },
+    {
+      "url": "http://res.cloudinary.com/zowo1441/image/upload/v1654710782/cld-sample-2.jpg",
+      "event": "event2",
+      "year": "2020"
+    },
+    {
+      "url": "http://res.cloudinary.com/zowo1441/image/upload/v1654710781/cld-sample.jpg",
+      "event": "event2",
+      "year": "2019"
+    },
+    {
+      "url": "http://res.cloudinary.com/zowo1441/image/upload/v1654710773/samples/landscapes/landscape-panorama.jpg",
+      "event": "event2",
+      "year": "2018"
+    },
+    {
+      "url": "http://res.cloudinary.com/zowo1441/image/upload/v1654710772/samples/animals/kitten-playing.gif",
+      "event": "event3",
+      "year": "2020"
+    },
+    {
+      "url": "http://res.cloudinary.com/zowo1441/image/upload/v1654710771/samples/landscapes/nature-mountains.jpg",
+      "event": "event3",
+      "year": "2019"
+    },
+    {
+      "url": "http://res.cloudinary.com/zowo1441/image/upload/v1654710770/samples/cloudinary-group.jpg",
+      "event": "event3",
+      "year": "2018"
+    },
+    {
+      "url": "http://res.cloudinary.com/zowo1441/image/upload/v1654710770/samples/food/spices.jpg",
+      "event": "event1",
+      "year": "2020"
+    }
+  ],
+  "next_cursor": "feefca093bf60116fa68a25b23a648172762a366918f2a85e3f5b377ae129bc8"
+}
