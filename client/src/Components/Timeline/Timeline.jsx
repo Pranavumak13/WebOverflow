@@ -38,14 +38,14 @@ export default function Timeline() {
     <>
       <h1>Timeline</h1>
 
-      <p>One</p>
-      <Cards event={events.event1} />
+      <p>Pragyaa</p>
+      <Cards event={events.Pragyaa} />
 
-      <p>Two</p>
-      <Cards event={events.event2} />
+      <p>Zenith</p>
+      <Cards event={events.Zenith} />
 
-      <p>Three</p>
-      <Cards event={events.event3} />
+      <p>Utsav</p>
+      <Cards event={events.Utsav} />
 
       {/* <button onClick={adder}>a</button> */}
     </>
