@@ -4,12 +4,15 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');        // for handling requests to the external API
+const cors = require('cors');
 
 const eventRouters = require('./routes/event.routes')      // for event routes
 
 const app = express();
 
+app.use(cors())
 app.use(bodyParser.urlencoded({extended: true}))
+
 
 
 const mongoose = require('mongoose');

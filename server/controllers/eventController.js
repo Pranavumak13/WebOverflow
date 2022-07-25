@@ -24,7 +24,14 @@ exports.get_yearly_event_media = function (req, res, next) {
       }).then((response) => {
         // in response, we get array of image as objects
         const media = response.data.data.images;
-        res.json(media);
+        var urlList = [];
+        for(var i=0; i<media.length; i++){
+          const obj = media[i];
+          for(var prop in obj){
+            if(prop==='link') urlList.push(obj[prop]);
+          }
+        }
+        res.send(urlList);        // sent array 
       });
     }
   });
@@ -56,13 +63,22 @@ exports.post_yearly_event_media = function (req, res, next) {
       album_id: newAlbum_id,
       del_hash: del_hash
     })
-    await new_album.save();
+    
+    new_album.save(function(err, newAlbum){
+      if(err){
+        res.json({
+          message: "error in creating new album. please try again later...",
+        })
+      }
+      else{
+        res.json({
+          message: "successful",
+          album_id: newAlbum_id, 
+          del_hash: del_hash
+        })
+      }
+    })
 
-    res.json({
-      message: "successful",
-      album_id: newAlbum_id,
-      del_hash: del_hash
-    });
   });
 };
 
