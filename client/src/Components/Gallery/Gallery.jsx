@@ -1,33 +1,52 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-// import images from "../sampleimages.json"; 
+import "./Gallery.css";
 import axios from "axios";
+
+const ImageGallery = (props) => {
+  return (
+    <ul className="img-gallery">
+      {props.list.map((i) => {
+        return (
+          <li>
+            <img src={i} width="100px" />
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
+const ImageModal = () => {
+  return (
+    <>
+      <div className="image-modal"></div>
+    </>
+  );
+};
 
 function Gallery() {
   let params = useParams();
+  const [urlList, setUrlList] = useState([]);
   const event = params.eventName.toLowerCase();
   const year = params.eventYear;
 
-  var urlList = [];
-  
-  axios({
-    method:'get',
-    url: `http://localhost:8000/gallery/${event}/${year}`,              // for eg: localhost:8000/gallery/pragyaa/2020
-  }).then((response)=>{
-    urlList = response.data;      // response will contain other info as well. bt the response.data will contain the actual images' link
-    for(var i = 0; i<urlList.length; i++){
-      console.log(urlList[i])       
-    }
-  })
+  useEffect(() => {
+    axios({
+      method: "get",
+      url: `http://localhost:8000/gallery/${event}/${year}`,
+    }).then((response) => {
+      setUrlList(response.data);
+    });
+  }, []);
 
   return (
     <>
+      <ImageModal />
       <h1>
         {params.eventName} {params.eventYear}
       </h1>
-      {urlList.map((i) => {
-        return <img style={{ width: "100px" }} src={i} alt="not found"></img>;
-      })}
+      <ImageGallery list={urlList} />
     </>
   );
 }
