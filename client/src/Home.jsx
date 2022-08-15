@@ -1,25 +1,35 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./Home.css";
+import { AdminContext } from "./App";
 import { Link } from "react-router-dom";
 import { Container } from "react-bootstrap";
 
-var isLoggedIn = false;
 var username = "John Doe";
 
 const LogInButton = (
   <div className="login-button">
-    <button>Sign In</button>
+    <Link to="auth">
+      <button>Sign In</button>
+    </Link>
   </div>
 );
-const LogInProfile = <div className="login-profile">Welcome, {username}</div>;
+const LogInProfile = (
+  <div className="login-profile">
+    Welcome, {username}
+    <Link to="/admin/upload">
+      <button>Upload Images</button>
+    </Link>
+  </div>
+);
 
 function Home() {
-  document.title = "Home";
+  const { isAdminLoggedIn } = useContext(AdminContext);
+
   return (
     <>
       <Container className="banner" fluid>
         <div className="title">Photos</div>
-        {isLoggedIn ? LogInProfile : LogInButton}
+        {isAdminLoggedIn ? LogInProfile : LogInButton}
       </Container>
       <Container className="container" fluid>
         <Link to="/timeline">
