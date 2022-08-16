@@ -7,7 +7,7 @@ export default function Upload() {
   return isAdminLoggedIn ? (
     <>
       <form
-        action="/add-images-to-album"
+        action="http://localhost:8000/gallery/zenith/2020/images"
         method="post"
         enctype="multipart/form-data"
       >
@@ -16,7 +16,7 @@ export default function Upload() {
         <input type="submit" value="Upload" />
       </form>
       <form
-        action="/add-images-to-album"
+        action="http://localhost:8000/gallery/event/year"
         method="post"
         enctype="multipart/form-data"
       >
