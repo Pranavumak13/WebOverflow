@@ -4,6 +4,7 @@ import { AdminContext } from "./App";
 import { Link } from "react-router-dom";
 import { Container } from "react-bootstrap";
 
+var isLoggedIn = false;
 var username = "John Doe";
 
 const LogInButton = (
