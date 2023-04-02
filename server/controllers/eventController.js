@@ -4,6 +4,7 @@ const multer = require('multer');         // for uploading images to the API
 const path = require('path');
 const fs = require('fs');
 const FormData = require('form-data');        // for handling the image files
+const { eventNames } = require("process");
 
 
 
@@ -31,12 +32,9 @@ exports.get_yearly_event_media = function (req, res, next) {
         const media = response.data.data.images;
         var urlList = [];
         for(var i=0; i<media.length; i++){
-          const obj = media[i];
-          for(var prop in obj){
-            if(prop==='link') urlList.push(obj[prop]);
-          }
+          urlList.push([media[i].link, media[i].deletehash])
         }
-        res.send(urlList);        // sent array 
+        res.send(urlList);        
       });
     }
   });
@@ -59,17 +57,14 @@ exports.post_yearly_event_album = function (req, res, next) {
       Authorization: process.env.IMGUR_AUTHORIZATION,
     },
   }).then(async (response) => {
-    const newAlbum_id = response.data.data.id;          //retrieving the album_id to store it in database
-    const del_hash = response.data.data.deletehash;     // in case if need to delete this album
-
     // adding this new album's details to the database
     const new_album = new Event({
       album: title,
-      album_id: newAlbum_id,
-      del_hash: del_hash
+      album_id: response.data.data.id,
+      del_hash: response.data.data.deletehash
     })
     
-    new_album.save(function(err, newAlbum){
+    await new_album.save(function(err, newAlbum){
       if(err){
         res.json({
           message: "error in creating new album. please try again later...",
@@ -78,8 +73,8 @@ exports.post_yearly_event_album = function (req, res, next) {
       else{
         res.json({
           message: "successful",
-          album_id: newAlbum_id, 
-          del_hash: del_hash
+          album_id: new_album.album_id, 
+          del_hash: new_album.del_hash
         })
       }
     })
@@ -92,7 +87,7 @@ exports.post_yearly_event_album = function (req, res, next) {
 // uploading images(multiple) to the album which is already created 
 // POST /gallery/event/year/images
 exports.post_yearly_event_images = function(req, res, next){
-
+  
   // for this, i need album_id from the database for the given event and year
   let event_parameter = req.params.event.toLowerCase(); 
   let year = req.params.year.toString();
@@ -101,7 +96,6 @@ exports.post_yearly_event_images = function(req, res, next){
   event_parameter = event_parameter+year;
 
   Event.findOne({ album : event_parameter}, async (err, eventData) => {
-    //if (err) console.log("Error: couldn't find specified album in db");
     if(err || eventData == null){
       res.json({
         status: "failed",
@@ -110,7 +104,6 @@ exports.post_yearly_event_images = function(req, res, next){
       })
     }
     else {
-      // we found the album
       const album_id = eventData.album_id;
 
       // now posting the images from the device to the album using the album_id
@@ -152,13 +145,149 @@ exports.post_yearly_event_images = function(req, res, next){
         uploaded_to: event_parameter
       })
     }
+  })  
+}
 
 
+// delete a single image 
+// DELETE /gallery/image/:deletehash
+exports.del_image = function(req, res, next){
+  let del_hash = req.params.deletehash
 
+  axios({
+    method:'delete',
+    url: `https://api.imgur.com/3/image/${del_hash}`,
+    headers:{
+      Authorization: process.env.IMGUR_AUTHORIZATION
+    }
   })
+  .then((response)=>{
+    console.log(response.data)
+    res.json({
+      status: "success", 
+      message: response.data
+    })
+  })
+  .catch((err)=>{
+    console.log(err)
+    res.json({
+      status: 'failed',
+      message: err
+    })
+  })
+}
+
+
+// deleting all the images from the album
+async function delete_all_media(album_id){
+  let deleted_media = 0
+  let images = 0
+
+  await axios({
+    method: 'get',
+    url:`https://api.imgur.com/3/album/${album_id}/images`,
+    headers:{
+      Authorization: process.env.IMGUR_AUTHORIZATION
+    }
+  })
+  .then(async (response)=>{
+    images = response.data.data.length
+
+    for(let i=0; i<response.data.data.length; i++){
+      let deletehash = response.data.data[i].deletehash
+      
+      await axios({
+        method: 'delete',
+        url: `https://api.imgur.com/3/image/${deletehash}`,
+        headers:{
+          Authorization: process.env.IMGUR_AUTHORIZATION
+        }
+      })
+      .then((response)=>{
+        deleted_media+=1
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+    }
+
+    if(deleted_media==response.data.data.length) return true
+    else return false;
+  })
+  .catch((err)=>{
+    console.log(err);
+  })
+
+  if(deleted_media==images) return true
+  else return false;
 
 }
 
+
+
+
+
+// deleting album
+// DELETE /gallery/event/year/delete
+exports.del_yearly_event_album = function (req, res, next){
+
+  // get the album_id from database
+  let event_param = req.params.event.toLowerCase() + req.params.year.toString();
+  
+  Event.findOne(
+    {album: event_param},
+    async function(err, event_data){
+      if(err || event_data==null){
+        res.json({
+          status: 'failed',
+          message: `album ${event_param} not found`
+        });
+      }
+      else{
+        const del_hash = event_data.del_hash;
+        const album_id = event_data.album_id;
+
+        let resp = await delete_all_media(album_id);       // delete all the images from this album
+
+        if(resp == true){
+
+          // node delete the album itself
+          await axios({
+            method: 'delete',
+            url:`https://api.imgur.com/3/album/${del_hash}`,
+            headers:{
+              Authorization: process.env.IMGUR_AUTHORIZATION
+            }
+          })
+          .then((response)=>{
+
+            // now delete from the db
+            Event.deleteOne(
+              {album_id: album_id},
+              function(err){
+                if(!err){
+                  res.json({
+                    status: "successful",
+                    message: 'album deleted!'
+                  })
+                }
+                else{
+                  res.json({
+                    status: 'failed',
+                    message: "couldnot delete album"
+                  })
+                }
+              }
+            )
+          })
+          .catch((err)=>{
+            console.log(err)
+          })
+        }
+      }
+    }
+  )
+}
 
 
 
