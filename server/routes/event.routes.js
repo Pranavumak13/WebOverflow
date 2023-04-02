@@ -15,7 +15,15 @@ router.post("/:event/:year", eventController.post_yearly_event_album);
 // POST /gallery/eventName/year/images
 router.post("/:event/:year/images", upload.array("imagesMedia", 30), eventController.post_yearly_event_images);
 
+// DELETE /gallery/eventName/year/delete
+router.delete("/:event/:year/delete", eventController.del_yearly_event_album);
+
+// DELETE /gallery/image/:deletehash
+router.delete("/image/:deletehash", eventController.del_image);
+
 
 
 
 module.exports = router;
+
+
