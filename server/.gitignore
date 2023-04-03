@@ -128,3 +128,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# docs
+secret_file.txt
+static
+session_db
+session_db/sessions.db
